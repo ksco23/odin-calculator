@@ -2,11 +2,11 @@ let numA = 0;
 let numB = 0;
 let op = '';
 
-console.log(operate(2, 2, '+'));
+/*console.log(operate(2, 2, '+'));
 console.log(operate(4, 2, '-'));
 console.log(operate(3, 2, '*'));
 console.log(operate(8, 2, '/'));
-console.log(operate(2, 2, 'x'));
+console.log(operate(2, 2, 'x'));*/
 
 
 
