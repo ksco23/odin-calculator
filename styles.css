@@ -15,6 +15,7 @@ body{
     max-width: 500px;
     min-width: 300px;
     padding: 8px;
+    margin: 0 auto;
 }
 
 #display{

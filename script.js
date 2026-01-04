@@ -7,7 +7,7 @@ let numA = 0;
 let numB = null;
 let op = null;
 
-
+let numInputShouldClearDisplay = true;
 
 btnContainer.addEventListener('click', btnClickEvt);
 
@@ -22,6 +22,13 @@ function btnClickEvt(e){
         else{
             parseInput(e.target.textContent);
         }
+    }
+}
+
+function solve(){
+    if(numB !== null && op !== null){
+        const solution = operate(numA, numB, op);
+        clear(roundSolution(solution));
     }
 }
 
@@ -40,6 +47,7 @@ function operate(a, b, op){
     }
     else{
         console.error('In operate, op is not valid.');
+        return false;
     }
 }
 
@@ -56,11 +64,30 @@ function divide(a,b){
     return a / b;
 }
 
-function clear(numAInitVal = 0){
-    numA = numAInitVal;
+function roundSolution(num){
+    let digits = MAX_DISPLAY_LENGTH;
+    if(num < 0){
+        //Remove a digit to account for the negative sign
+        digits--;
+    }
+    if(!Number.isInteger(num)){
+        //Remove a digit to account for the decimal
+        digits--;
+    }
+    if(num > -1 && num < 1){
+        //Remove a digit to account for the leading 0
+        digits--;
+    }
+
+    return (+num.toPrecision(digits));
+};
+
+function clear(initValNumA = 0){
+    numA = initValNumA;
     numB = null;
     op = null;
-    updateDisplay('0');
+    updateDisplay('' + initValNumA);
+    numInputShouldClearDisplay = true;
 }
 
 function parseInput(inputTxt){
@@ -82,21 +109,22 @@ function handleNumericalInput(inputTxt){
     const curDisplay = calcDisplay.textContent;
     let updatedDisplayTxt = curDisplay;
 
-    if(curDisplay !== '0'){
-        if(op === null){
-            updatedDisplayTxt += inputTxt;
+    if(op === null){
+        if(numInputShouldClearDisplay){
+            updatedDisplayTxt = inputTxt;
+            numInputShouldClearDisplay = false;
         }
         else{
-            if(numB === null){
-                updatedDisplayTxt = inputTxt;
-            }
-            else{
-                updatedDisplayTxt += inputTxt;
-            }
+            updatedDisplayTxt += inputTxt;
         }
     }
     else{
-        updatedDisplayTxt = inputTxt;
+        if(numB === null){
+            updatedDisplayTxt = inputTxt;
+        }
+        else{
+            updatedDisplayTxt += inputTxt;
+        }
     }
 
     updateDisplay(updatedDisplayTxt);
@@ -105,16 +133,36 @@ function handleNumericalInput(inputTxt){
 
 function handleDecimalInput(inputTxt){
     const curDisplay = calcDisplay.textContent;
-    if(!curDisplay.includes('.')){
-        updateDisplay(curDisplay + inputTxt);
-        updateNumVars(curDisplay + inputTxt);
+    let updatedDisplayTxt = curDisplay;
+
+    if(op === null){
+        if(numInputShouldClearDisplay){
+            updatedDisplayTxt = '0.';
+            numInputShouldClearDisplay = false;
+        }
+        else{
+            if(!curDisplay.includes('.')){
+                updatedDisplayTxt += inputTxt;
+            }   
+        }
     }
+    else{
+        if(numB === null){
+            updatedDisplayTxt = '0.';
+        }
+        else{
+            if(!curDisplay.includes('.')){
+                updatedDisplayTxt += inputTxt;
+            }
+        }
+    }
+    updateDisplay(updatedDisplayTxt);
+    updateNumVars(updatedDisplayTxt);
 }
 
 function handleOpInput(inputTxt){
-    if(op !== inputTxt){
-        op = inputTxt;
-    }
+    solve();
+    op = inputTxt;
 }
 
 function updateDisplay(displayString){
