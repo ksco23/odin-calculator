@@ -4,8 +4,8 @@ const btnContainer = document.querySelector('#buttons');
 const calcDisplay = document.querySelector('#display');
 
 let numA = 0;
-let numB = 0;
-let op = '';
+let numB = null;
+let op = null;
 
 
 
@@ -16,8 +16,11 @@ function btnClickEvt(e){
         if(e.target.id === 'clearBtn'){
             clear();
         }
+        else if(e.target.id === 'equalBtn'){
+            solve();
+        }
         else{
-            validateInput(e.target.textContent);
+            parseInput(e.target.textContent);
         }
     }
 }
@@ -53,43 +56,76 @@ function divide(a,b){
     return a / b;
 }
 
-function clear(){
-    numA = 0;
-    numB = 0;
-    op = '';
+function clear(numAInitVal = 0){
+    numA = numAInitVal;
+    numB = null;
+    op = null;
     updateDisplay('0');
 }
 
-function validateInput(inputTxt){
-    //get current display
-    //IF the input is a number or decimal
-        //IF input is 0 only don't accpet it if current display is 0
-        //IF input is a decimal don't accpt it if current display already contains a decimal
-        
+function parseInput(inputTxt){
     const curDisplay = calcDisplay.textContent;
-
     if(curDisplay.length < MAX_DISPLAY_LENGTH){
-        if(inputTxt.search(/[1-9]/) !== -1){
-            if(curDisplay === '0'){
-                updateDisplay(inputTxt);
-            }
-            else{
-                updateDisplay(curDisplay + inputTxt);
-            }
-        }
-        else if(inputTxt === '0'){
-            if(curDisplay !== '0'){
-                updateDisplay(curDisplay + inputTxt);
-            }
+        if(inputTxt.search(/[0-9]/) !== -1){
+            handleNumericalInput(inputTxt);
         }
         else if(inputTxt === '.'){
-            if(!curDisplay.includes('.')){
-                updateDisplay(curDisplay + inputTxt);
+            handleDecimalInput(inputTxt);
+        }
+        else if(inputTxt.search(/[[\+\-\*\/]]/)){
+            handleOpInput(inputTxt);
+        }
+    }
+}
+
+function handleNumericalInput(inputTxt){
+    const curDisplay = calcDisplay.textContent;
+    let updatedDisplayTxt = curDisplay;
+
+    if(curDisplay !== '0'){
+        if(op === null){
+            updatedDisplayTxt += inputTxt;
+        }
+        else{
+            if(numB === null){
+                updatedDisplayTxt = inputTxt;
+            }
+            else{
+                updatedDisplayTxt += inputTxt;
             }
         }
+    }
+    else{
+        updatedDisplayTxt = inputTxt;
+    }
+
+    updateDisplay(updatedDisplayTxt);
+    updateNumVars(updatedDisplayTxt);
+}
+
+function handleDecimalInput(inputTxt){
+    const curDisplay = calcDisplay.textContent;
+    if(!curDisplay.includes('.')){
+        updateDisplay(curDisplay + inputTxt);
+        updateNumVars(curDisplay + inputTxt);
+    }
+}
+
+function handleOpInput(inputTxt){
+    if(op !== inputTxt){
+        op = inputTxt;
     }
 }
 
 function updateDisplay(displayString){
     calcDisplay.textContent = displayString;
+}
+
+function updateNumVars(numString){
+    if(op === null){
+        numA = +numString;
+    }
+    else{
+        numB = +numString;
+    }
 }
