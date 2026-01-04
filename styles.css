@@ -24,6 +24,7 @@ body{
     margin-bottom: 15px;
     text-align: right;
     font-size: 2rem;
+    font-family: monospace;
 }
 
 #buttons,
