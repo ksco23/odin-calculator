@@ -2,6 +2,8 @@ const MAX_DISPLAY_LENGTH = 13;
 
 const btnContainer = document.querySelector('#buttons');
 const calcDisplay = document.querySelector('#display');
+const numDisplay = calcDisplay.querySelector('#numbers');
+const opDisplay = calcDisplay.querySelector('#operator');
 
 let numA = 0;
 let numB = null;
@@ -99,12 +101,13 @@ function clear(initValNumA = 0){
     numA = initValNumA;
     numB = null;
     op = null;
+    opDisplay.textContent = '\u00A0';
     updateDisplay('' + initValNumA);
     numInputShouldClearDisplay = true;
 }
 
 function parseInput(inputTxt){
-    const curDisplay = calcDisplay.textContent;
+    const curDisplay = numDisplay.textContent;
     if(curDisplay.length < MAX_DISPLAY_LENGTH){
         if(inputTxt.search(/[0-9]/) !== -1){
             handleNumericalInput(inputTxt);
@@ -119,7 +122,7 @@ function parseInput(inputTxt){
 }
 
 function handleNumericalInput(inputTxt){
-    const curDisplay = calcDisplay.textContent;
+    const curDisplay = numDisplay.textContent;
     let updatedDisplayTxt = curDisplay;
 
     if(op === null){
@@ -145,7 +148,7 @@ function handleNumericalInput(inputTxt){
 }
 
 function handleDecimalInput(inputTxt){
-    const curDisplay = calcDisplay.textContent;
+    const curDisplay = numDisplay.textContent;
     let updatedDisplayTxt = curDisplay;
 
     if(op === null){
@@ -176,10 +179,11 @@ function handleDecimalInput(inputTxt){
 function handleOpInput(inputTxt){
     solve();
     op = inputTxt;
+    opDisplay.textContent = inputTxt;
 }
 
 function updateDisplay(displayString){
-    calcDisplay.textContent = displayString;
+    numDisplay.textContent = displayString;
 }
 
 function updateNumVars(numString){
