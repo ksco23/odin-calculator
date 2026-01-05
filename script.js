@@ -10,6 +10,7 @@ let op = null;
 let numInputShouldClearDisplay = true;
 
 btnContainer.addEventListener('click', btnClickEvt);
+document.addEventListener('keyup', keyupEvt);
 
 function btnClickEvt(e){
     if(e.target.tagName === 'BUTTON'){
@@ -22,6 +23,18 @@ function btnClickEvt(e){
         else{
             parseInput(e.target.textContent);
         }
+    }
+}
+
+function keyupEvt(e){
+    if(e.key === 'Escape'){
+        clear();
+    }
+    else if(e.key === 'Enter' || e.key === '='){
+        solve();
+    }
+    else if(e.key.search(/[0-9\+\-\*\/\.]/) !== -1){
+        parseInput(e.key);
     }
 }
 
@@ -99,7 +112,7 @@ function parseInput(inputTxt){
         else if(inputTxt === '.'){
             handleDecimalInput(inputTxt);
         }
-        else if(inputTxt.search(/[[\+\-\*\/]]/)){
+        else if(inputTxt.search(/[\+\-\*\/]/) !== -1){
             handleOpInput(inputTxt);
         }
     }
