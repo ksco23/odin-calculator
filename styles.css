@@ -28,6 +28,10 @@ body{
     font-family: monospace;
 }
 
+#curEquation{
+    font-size: 1rem;
+}
+
 #buttons,
 .buttonRow{
     display: flex;

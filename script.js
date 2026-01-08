@@ -3,7 +3,7 @@ const MAX_DISPLAY_LENGTH = 13;
 const btnContainer = document.querySelector('#buttons');
 const calcDisplay = document.querySelector('#display');
 const numDisplay = calcDisplay.querySelector('#numbers');
-const opDisplay = calcDisplay.querySelector('#operator');
+const curEquationDisplay = calcDisplay.querySelector('#curEquation');
 
 let numA = 0;
 let numB = null;
@@ -35,7 +35,7 @@ function keyupEvt(e){
     else if(e.key === 'Enter' || e.key === '='){
         solve();
     }
-    else if(e.key.search(/[0-9\+\-\*\/\.]/) !== -1){
+    else if(e.key.length === 1 && e.key.search(/[0-9\+\-\*\/\.]/) !== -1){
         parseInput(e.key);
     }
 }
@@ -101,7 +101,7 @@ function clear(initValNumA = 0){
     numA = initValNumA;
     numB = null;
     op = null;
-    opDisplay.textContent = '\u00A0';
+    curEquationDisplay.textContent = '\u00A0';
     updateDisplay('' + initValNumA);
     numInputShouldClearDisplay = true;
 }
@@ -143,8 +143,9 @@ function handleNumericalInput(inputTxt){
         }
     }
 
-    updateDisplay(updatedDisplayTxt);
     updateNumVars(updatedDisplayTxt);
+    updateDisplay(updatedDisplayTxt);
+    updateCurEquationDisplay();
 }
 
 function handleDecimalInput(inputTxt){
@@ -172,18 +173,33 @@ function handleDecimalInput(inputTxt){
             }
         }
     }
-    updateDisplay(updatedDisplayTxt);
+
     updateNumVars(updatedDisplayTxt);
+    updateDisplay(updatedDisplayTxt);
+    updateCurEquationDisplay();
 }
 
 function handleOpInput(inputTxt){
     solve();
     op = inputTxt;
-    opDisplay.textContent = inputTxt;
+    updateCurEquationDisplay();
 }
 
 function updateDisplay(displayString){
     numDisplay.textContent = displayString;
+}
+
+function updateCurEquationDisplay(){
+    let curEquation = '' + numA;
+    
+    if(op !== null){
+        curEquation += ` ${op}`;
+    }
+    if(numB !== null){
+        curEquation += ` ${numB}`;
+    }
+
+    curEquationDisplay.textContent = curEquation;
 }
 
 function updateNumVars(numString){
