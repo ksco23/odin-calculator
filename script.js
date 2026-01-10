@@ -10,6 +10,7 @@ let numB = null;
 let op = null;
 
 let numInputShouldClearDisplay = true;
+curEquationDisplay.classList.add('opacity0');
 
 btnContainer.addEventListener('click', btnClickEvt);
 document.addEventListener('keyup', keyupEvt);
@@ -43,7 +44,10 @@ function keyupEvt(e){
 function solve(){
     if(numB !== null && op !== null){
         const solution = operate(numA, numB, op);
-        clear(roundSolution(solution));
+        const roundedSolution = roundSolution(solution);
+        updateDisplay(roundedSolution);
+        updateCurEquationDisplay(true);
+        clear(roundedSolution);
     }
 }
 
@@ -101,8 +105,10 @@ function clear(initValNumA = 0){
     numA = initValNumA;
     numB = null;
     op = null;
-    curEquationDisplay.textContent = '\u00A0';
-    updateDisplay('' + initValNumA);
+    if(initValNumA === 0){
+        updateDisplay('0');
+        hideCurEquationDisplay();
+    }
     numInputShouldClearDisplay = true;
 }
 
@@ -189,14 +195,19 @@ function updateDisplay(displayString){
     numDisplay.textContent = displayString;
 }
 
-function updateCurEquationDisplay(){
-    let curEquation = '' + numA;
+function updateCurEquationDisplay(isSolved = false){
+    hideCurEquationDisplay();
+    let curEquation = '0';
     
     if(op !== null){
-        curEquation += ` ${op}`;
+        curEquation = `${numA} ${op}`;
+        showCurEquationDisplay();
     }
     if(numB !== null){
         curEquation += ` ${numB}`;
+    }
+    if(isSolved){
+        curEquation += ' =';
     }
 
     curEquationDisplay.textContent = curEquation;
@@ -209,4 +220,14 @@ function updateNumVars(numString){
     else{
         numB = +numString;
     }
+}
+
+function hideCurEquationDisplay(){
+    curEquationDisplay.classList.add('opacity0');
+    curEquationDisplay.classList.remove('opacity1');
+}
+
+function showCurEquationDisplay(){
+    curEquationDisplay.classList.add('opacity1');
+    curEquationDisplay.classList.remove('opacity0');
 }
