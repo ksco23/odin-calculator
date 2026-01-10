@@ -53,6 +53,13 @@ button.squareBtn{
     aspect-ratio: 1 / 1;
 }
 
+button.opBtn{
+    background-color: #94d4fb;
+}
+button#clearBtn{
+    background-color: #fbb694;
+}
+
 #clearBtn{
     font-size: 1rem;
 }

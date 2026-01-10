@@ -33,7 +33,12 @@ function keyupEvt(e){
     if(e.key === 'Escape'){
         clear();
     }
-    else if(e.key === 'Enter' || e.key === '='){
+    else if(e.key === 'Enter'){
+        if(!btnContainer.contains(document.activeElement)){
+            solve();
+        }
+    }
+    else if(e.key === '='){
         solve();
     }
     else if(e.key.length === 1 && e.key.search(/[0-9\+\-\*\/\.]/) !== -1){
