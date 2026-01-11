@@ -9,6 +9,7 @@ let numA = 0;
 let numB = null;
 let op = null;
 
+let allowBackspace = true;
 let numInputShouldClearDisplay = true;
 curEquationDisplay.classList.add('opacity0');
 
@@ -58,6 +59,7 @@ function solve(){
         const roundedSolution = roundSolution(solution);
         updateDisplay(roundedSolution);
         updateCurEquationDisplay(true);
+        allowBackspace = false;
         clear(roundedSolution);
     }
 }
@@ -141,6 +143,7 @@ function parseInput(inputTxt){
 function handleNumericalInput(inputTxt){
     const curDisplay = numDisplay.textContent;
     let updatedDisplayTxt = curDisplay;
+    allowBackspace = true;
 
     if(op === null){
         if(numInputShouldClearDisplay){
@@ -204,17 +207,19 @@ function handleOpInput(inputTxt){
 }
 
 function backspace(){
-    if(op === null){
-        numA = deleteLastDigit(numA);
-        numInputShouldClearDisplay = numA === 0;
-        updateDisplay('' + numA);
-    }
-    else{
-        if(numB !== null){
-            numB = deleteLastDigit(numB);
-            numInputShouldClearDisplay = numB === 0;
-            updateDisplay('' + numB);
-            updateCurEquationDisplay();
+    if(allowBackspace){
+        if(op === null){
+            numA = deleteLastDigit(numA);
+            numInputShouldClearDisplay = numA === 0;
+            updateDisplay('' + numA);
+        }
+        else{
+            if(numB !== null){
+                numB = deleteLastDigit(numB);
+                numInputShouldClearDisplay = numB === 0;
+                updateDisplay('' + numB);
+                updateCurEquationDisplay();
+            }
         }
     }
 }
