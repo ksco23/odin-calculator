@@ -155,7 +155,7 @@ function handleNumericalInput(inputTxt){
         }
     }
     else{
-        if(numB === null || numInputShouldClearDisplay){
+        if(numB === null || numB === 0 || numInputShouldClearDisplay){
             updatedDisplayTxt = inputTxt;
             numInputShouldClearDisplay = false;
         }
