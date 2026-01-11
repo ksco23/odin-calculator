@@ -44,6 +44,9 @@ function keyupEvt(e){
     else if(e.key.length === 1 && e.key.search(/[0-9\+\-\*\/\.]/) !== -1){
         parseInput(e.key);
     }
+    else if(e.key === 'Backspace'){
+        backspace();
+    }
 }
 
 function solve(){
@@ -146,8 +149,9 @@ function handleNumericalInput(inputTxt){
         }
     }
     else{
-        if(numB === null){
+        if(numB === null || numInputShouldClearDisplay){
             updatedDisplayTxt = inputTxt;
+            numInputShouldClearDisplay = false;
         }
         else{
             updatedDisplayTxt += inputTxt;
@@ -194,6 +198,33 @@ function handleOpInput(inputTxt){
     solve();
     op = inputTxt;
     updateCurEquationDisplay();
+}
+
+function backspace(){
+    if(op === null){
+        numA = deleteLastDigit(numA);
+        numInputShouldClearDisplay = numA === 0;
+        updateDisplay('' + numA);
+    }
+    else{
+        if(numB !== null){
+            numB = deleteLastDigit(numB);
+            numInputShouldClearDisplay = numB === 0;
+            updateDisplay('' + numB);
+            updateCurEquationDisplay();
+        }
+    }
+}
+
+function deleteLastDigit(num){
+    const numString = '' + num;
+    let newNum = 0;
+
+    if(numString.length > 1){
+        newNum = +(numString.slice(0, -1));
+    }
+
+    return newNum;
 }
 
 function updateDisplay(displayString){
