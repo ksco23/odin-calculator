@@ -56,11 +56,16 @@ button.squareBtn{
 button.opBtn{
     background-color: #94d4fb;
 }
-button#clearBtn{
+#clearBtn{
     background-color: #fbb694;
 }
 
-#clearBtn{
+#backspace{
+    background-color: #ffd6c1;
+}
+
+#clearBtn,
+#backspace{
     font-size: 1rem;
 }
 

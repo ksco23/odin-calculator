@@ -23,6 +23,9 @@ function btnClickEvt(e){
         else if(e.target.id === 'equalBtn'){
             solve();
         }
+        else if(e.target.id === 'backspace'){
+            backspace();
+        }
         else{
             parseInput(e.target.textContent);
         }
