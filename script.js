@@ -13,11 +13,11 @@ const calcData = {
     },
     b: {
         num: null,
-        str: '0',
+        str: '',
         active: false
     },
     op: null,
-    solutionShowing: false
+    //solutionShowing: false
 };
 
 updateDisplay(calcData.a.str);
@@ -38,7 +38,7 @@ function btnClickEvt(e){
     if(e.target.tagName === 'BUTTON'){
         if(e.target.id === 'clearBtn'){
             //clear();
-            resetCalcData();
+            resetCalcData('0', false);
             updateDisplay(calcData.a.str);
         }
         else if(e.target.id === 'equalBtn'){
@@ -55,7 +55,9 @@ function btnClickEvt(e){
 
 function keyupEvt(e){
     if(e.key === 'Escape'){
-        clear();
+        //clear();
+        resetCalcData('0', false);
+        updateDisplay(calcData.a.str);
     }
     else if(e.key === 'Enter'){
         if(!btnContainer.contains(document.activeElement)){
@@ -83,7 +85,7 @@ function solve(){
         const roundedSolution = roundSolution(solution);
         updateDisplay(roundedSolution);
 
-        resetCalcData(roundedSolution);
+        resetCalcData(roundedSolution, true);
     }
 
     /*
@@ -158,16 +160,16 @@ function roundSolution(num){
     numInputShouldClearDisplay = true;
 }*/
 
-function resetCalcData(solutionStr){
-    calcData.a.num = null;
-    calcData.a.str = typeof solutionStr !== 'undefined' ? solutionStr : '0';
-    calcData.a.active = true;
+function resetCalcData(numStr, solutionShowing){
+    calcData.a.num = solutionShowing ? +numStr : null;
+    calcData.a.str = numStr;
+    calcData.a.active = !solutionShowing;
 
     calcData.b.num = null;
-    calcData.b.str = '0';
-    calcData.b.active = false;
+    calcData.b.str = '';
+    calcData.b.active = solutionShowing;
 
-    calcData.solutionShowing = typeof solutionStr !== 'undefined';
+    //calcData.solutionShowing = typeof solutionStr !== 'undefined';
 }
 
 function parseInput(inputTxt){
@@ -267,7 +269,20 @@ function handleDecimalInput(inputTxt){
 }
 
 function handleOpInput(inputTxt){
-    calcData.op = inputTxt;
+
+    /*
+    IF a is active
+        save a's num
+        switch b to active
+        swithc a to inactive
+
+    ELSE (b is active)
+        IF b has been set
+            solve the equation
+        ELSE b hasn't been set - num is null and str is ''
+
+
+    */
 
     if(calcData.a.active){
         calcData.a.active = false;
@@ -275,9 +290,16 @@ function handleOpInput(inputTxt){
         calcData.a.num = +calcData.a.str;
     }
     else{
-        calcData.b.num = +calcData.b.str;
-        solve();
+        if(calcData.b.num === null && calcData.b.str === ''){
+            calcData.b.active = true;
+        }
+        else{
+            calcData.b.num = +calcData.b.str;
+            solve();
+        }
     }
+
+    calcData.op = inputTxt;
 
     /*solve();
     op = inputTxt;
