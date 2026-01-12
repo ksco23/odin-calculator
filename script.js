@@ -16,19 +16,13 @@ const calcData = {
         str: '',
         active: false
     },
-    op: null,
-    //solutionShowing: false
+    op: null
 };
 
 updateDisplay(calcData.a.str);
 
-
-/*let numA = 0;
-let numB = null;
-let op = null;*/
-
 let allowBackspace = true;
-let numInputShouldClearDisplay = true;
+let numInputShouldClearDisplay = true; //Remove later
 curEquationDisplay.classList.add('opacity0');
 
 btnContainer.addEventListener('click', btnClickEvt);
@@ -37,9 +31,7 @@ document.addEventListener('keyup', keyupEvt);
 function btnClickEvt(e){
     if(e.target.tagName === 'BUTTON'){
         if(e.target.id === 'clearBtn'){
-            //clear();
-            resetCalcData('0', false);
-            updateDisplay(calcData.a.str);
+            handleClearInput();
         }
         else if(e.target.id === 'equalBtn'){
             solve();
@@ -55,9 +47,7 @@ function btnClickEvt(e){
 
 function keyupEvt(e){
     if(e.key === 'Escape'){
-        //clear();
-        resetCalcData('0', false);
-        updateDisplay(calcData.a.str);
+        handleClearInput();
     }
     else if(e.key === 'Enter'){
         if(!btnContainer.contains(document.activeElement)){
@@ -87,16 +77,6 @@ function solve(){
 
         resetCalcData(roundedSolution, true);
     }
-
-    /*
-    if(numB !== null && op !== null){
-        const solution = operate(numA, numB, op);
-        const roundedSolution = roundSolution(solution);
-        updateDisplay(roundedSolution);
-        updateCurEquationDisplay(true);
-        allowBackspace = false;
-        clear(roundedSolution);
-    }*/
 }
 
 function operate(a, b, op){
@@ -149,17 +129,6 @@ function roundSolution(num){
     return (+num.toPrecision(digits));
 };
 
-/*function clear(initValNumA = 0){
-    numA = initValNumA;
-    numB = null;
-    op = null;
-    if(initValNumA === 0){
-        updateDisplay('0');
-        hideCurEquationDisplay();
-    }
-    numInputShouldClearDisplay = true;
-}*/
-
 function resetCalcData(numStr, solutionShowing){
     calcData.a.num = solutionShowing ? +numStr : null;
     calcData.a.str = numStr;
@@ -168,8 +137,6 @@ function resetCalcData(numStr, solutionShowing){
     calcData.b.num = null;
     calcData.b.str = '';
     calcData.b.active = solutionShowing;
-
-    //calcData.solutionShowing = typeof solutionStr !== 'undefined';
 }
 
 function parseInput(inputTxt){
@@ -187,6 +154,11 @@ function parseInput(inputTxt){
     }
 }
 
+function handleClearInput(){
+    resetCalcData('0', false);
+    updateDisplay(calcData.a.str);
+}
+
 function handleNumericalInput(inputTxt){
     const entryObj = calcData.a.active ? calcData.a : calcData.b;
     
@@ -198,92 +170,21 @@ function handleNumericalInput(inputTxt){
     }
 
     updateDisplay(entryObj.str);
-
-
-
-    /*const curDisplay = numDisplay.textContent;
-    let updatedDisplayTxt = curDisplay;
-    allowBackspace = true;
-
-    if(op === null){
-        if(numInputShouldClearDisplay){
-            updatedDisplayTxt = inputTxt;
-            numInputShouldClearDisplay = false;
-        }
-        else{
-            updatedDisplayTxt += inputTxt;
-        }
-    }
-    else{
-        if(numB === null || numB === 0 || numInputShouldClearDisplay){
-            updatedDisplayTxt = inputTxt;
-            numInputShouldClearDisplay = false;
-        }
-        else{
-            updatedDisplayTxt += inputTxt;
-        }
-    }
-
-    updateNumVars(updatedDisplayTxt);
-    updateDisplay(updatedDisplayTxt);
-    updateCurEquationDisplay();*/
 }
 
 function handleDecimalInput(inputTxt){
     const entryObj = calcData.a.active ? calcData.a : calcData.b;
 
     if(!entryObj.str.includes('.')){
+        if(entryObj.str.length === 0){
+            entryObj.str = '0';
+        }
         entryObj.str += inputTxt;
-        updatedDisplay(entryObj.str);
+        updateDisplay(entryObj.str);
     }
-    
-    
-    /*const curDisplay = numDisplay.textContent;
-    let updatedDisplayTxt = curDisplay;
-
-    if(op === null){
-        if(numInputShouldClearDisplay){
-            updatedDisplayTxt = '0.';
-            numInputShouldClearDisplay = false;
-        }
-        else{
-            if(!curDisplay.includes('.')){
-                updatedDisplayTxt += inputTxt;
-            }   
-        }
-    }
-    else{
-        if(numB === null){
-            updatedDisplayTxt = '0.';
-        }
-        else{
-            if(!curDisplay.includes('.')){
-                updatedDisplayTxt += inputTxt;
-            }
-        }
-    }
-
-    updateNumVars(updatedDisplayTxt);
-    updateDisplay(updatedDisplayTxt);
-    updateCurEquationDisplay();*/
 }
 
 function handleOpInput(inputTxt){
-
-    /*
-    IF a is active
-        save a's num
-        switch b to active
-        swithc a to inactive
-
-    ELSE (b is active)
-        IF b has been set
-            solve the equation
-        ELSE b hasn't been set - num is null and str is ''
-
-
-    */
-
     if(calcData.a.active){
         calcData.a.active = false;
         calcData.b.active = true;
@@ -300,10 +201,6 @@ function handleOpInput(inputTxt){
     }
 
     calcData.op = inputTxt;
-
-    /*solve();
-    op = inputTxt;
-    updateCurEquationDisplay();*/
 }
 
 function backspace(){
