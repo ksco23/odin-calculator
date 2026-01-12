@@ -137,6 +137,8 @@ function resetCalcData(numStr, solutionShowing){
     calcData.b.num = null;
     calcData.b.str = '';
     calcData.b.active = solutionShowing;
+
+    allowBackspace = !solutionShowing;
 }
 
 function parseInput(inputTxt){
@@ -167,6 +169,7 @@ function handleNumericalInput(inputTxt){
     }
     else{
         entryObj.str += inputTxt;
+        allowBackspace = true;
     }
 
     updateDisplay(entryObj.str);
@@ -200,25 +203,23 @@ function handleOpInput(inputTxt){
         }
     }
 
+    allowBackspace = false;
     calcData.op = inputTxt;
 }
 
 function backspace(){
     if(allowBackspace){
-        if(op === null){
-            numA = deleteLastDigit(numA);
-            numInputShouldClearDisplay = numA === 0;
-            updateDisplay('' + numA);
-        }
-        else{
-            if(numB !== null){
-                numB = deleteLastDigit(numB);
-                numInputShouldClearDisplay = numB === 0;
-                updateDisplay('' + numB);
-                updateCurEquationDisplay();
-            }
-        }
+        const entryObj = calcData.a.active ? calcData.a : calcData.b;
+        entryObj.str = deleteLastChar(entryObj.str);
+        updateDisplay(entryObj.str);
     }
+}
+
+function deleteLastChar(str){
+    if(str.length > 1){
+        return str.slice(0, -1);
+    }
+    return '0';
 }
 
 function deleteLastDigit(num){
