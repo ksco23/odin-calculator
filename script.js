@@ -16,13 +16,13 @@ const calcData = {
         str: '',
         active: false
     },
-    op: null
+    op: null,
+    solutionShowing: false
 };
 
 updateDisplay(calcData.a.str);
 
 let allowBackspace = true;
-let numInputShouldClearDisplay = true; //Remove later
 curEquationDisplay.classList.add('opacity0');
 
 btnContainer.addEventListener('click', btnClickEvt);
@@ -72,7 +72,8 @@ function solve(){
 
     if(calcData.a.num !== null && calcData.b.num !== null && calcData.op !== null){
         const solution = operate(calcData.a.num, calcData.b.num, calcData.op);
-        const roundedSolution = roundSolution(solution);
+        const roundedSolution = '' + roundSolution(solution);
+        updateCurEquationDisplay(true);
         updateDisplay(roundedSolution);
 
         resetCalcData(roundedSolution, true);
@@ -139,15 +140,19 @@ function resetCalcData(numStr, solutionShowing){
     calcData.b.active = solutionShowing;
 
     allowBackspace = !solutionShowing;
+    calcData.solutionShowing = solutionShowing;
+    calcData.op = null;
 }
 
 function parseInput(inputTxt){
     const curDisplay = numDisplay.textContent;
     if(curDisplay.length < MAX_DISPLAY_LENGTH){
         if(inputTxt.search(/[0-9]/) !== -1){
+            manageNonOpInputSolutionIsShowing();
             handleNumericalInput(inputTxt);
         }
         else if(inputTxt === '.'){
+            manageNonOpInputSolutionIsShowing();
             handleDecimalInput(inputTxt);
         }
         else if(inputTxt.search(/[\+\-\*\/]/) !== -1){
@@ -156,8 +161,15 @@ function parseInput(inputTxt){
     }
 }
 
+function manageNonOpInputSolutionIsShowing(){
+    if(calcData.solutionShowing && calcData.op === null){
+        resetCalcData('0', false);
+    }
+}
+
 function handleClearInput(){
     resetCalcData('0', false);
+    updateCurEquationDisplay();
     updateDisplay(calcData.a.str);
 }
 
@@ -173,6 +185,7 @@ function handleNumericalInput(inputTxt){
     }
 
     updateDisplay(entryObj.str);
+    updateCurEquationDisplay();
 }
 
 function handleDecimalInput(inputTxt){
@@ -184,10 +197,13 @@ function handleDecimalInput(inputTxt){
         }
         entryObj.str += inputTxt;
         updateDisplay(entryObj.str);
+        updateCurEquationDisplay();
+        allowBackspace = true;
     }
 }
 
 function handleOpInput(inputTxt){
+    calcData.solutionShowing = false;
     if(calcData.a.active){
         calcData.a.active = false;
         calcData.b.active = true;
@@ -205,12 +221,14 @@ function handleOpInput(inputTxt){
 
     allowBackspace = false;
     calcData.op = inputTxt;
+    updateCurEquationDisplay();
 }
 
 function backspace(){
     if(allowBackspace){
         const entryObj = calcData.a.active ? calcData.a : calcData.b;
         entryObj.str = deleteLastChar(entryObj.str);
+        updateCurEquationDisplay();
         updateDisplay(entryObj.str);
     }
 }
@@ -238,30 +256,16 @@ function updateDisplay(displayString){
 }
 
 function updateCurEquationDisplay(isSolved = false){
-    hideCurEquationDisplay();
-    let curEquation = '0';
-    
-    if(op !== null){
-        curEquation = `${numA} ${op}`;
-        showCurEquationDisplay();
-    }
-    if(numB !== null){
-        curEquation += ` ${numB}`;
-    }
+    //hideCurEquationDisplay();
+    const op = calcData.op !== null ? calcData.op : '';
+    let curEquation = `${calcData.a.str} ${op} ${calcData.b.str}`;
+
     if(isSolved){
         curEquation += ' =';
     }
 
     curEquationDisplay.textContent = curEquation;
-}
-
-function updateNumVars(numString){
-    if(op === null){
-        numA = +numString;
-    }
-    else{
-        numB = +numString;
-    }
+    showCurEquationDisplay();
 }
 
 function hideCurEquationDisplay(){
