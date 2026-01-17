@@ -1,4 +1,5 @@
 const MAX_DISPLAY_LENGTH = 13;
+const DIVIDE_BY_ZERO_MESSAGE = 'YOU CAN\'T! /0';
 
 const btnContainer = document.querySelector('#buttons');
 const calcDisplay = document.querySelector('#display');
@@ -17,13 +18,13 @@ const calcData = {
         active: false
     },
     op: null,
-    solutionShowing: false
+    solutionShowing: false,
+    errorShowing: false
 };
 
 updateDisplay(calcData.a.str);
 
 let allowBackspace = true;
-curEquationDisplay.classList.add('opacity0');
 
 btnContainer.addEventListener('click', btnClickEvt);
 document.addEventListener('keyup', keyupEvt);
@@ -66,17 +67,30 @@ function keyupEvt(e){
 }
 
 function solve(){
-    if(calcData.b.num === null && (calcData.b.active && calcData.b.str !== '')){
-        calcData.b.num = +calcData.b.str;
+    if(calcData.b.active){
+        if(calcData.b.str !== ''){
+            calcData.b.num = +calcData.b.str;
+        }
+        else{
+            calcData.b.num = null;
+        }
     }
 
     if(calcData.a.num !== null && calcData.b.num !== null && calcData.op !== null){
-        const solution = operate(calcData.a.num, calcData.b.num, calcData.op);
-        const roundedSolution = '' + roundSolution(solution);
-        updateCurEquationDisplay(true);
-        updateDisplay(roundedSolution);
+        if(calcData.op === '/' && calcData.b.num === 0){
+            updateDisplay(DIVIDE_BY_ZERO_MESSAGE);
+            calcData.b.str = '';
+            calcData.errorShowing = true;
+            allowBackspace = false;
+        }
+        else{
+            const solution = operate(calcData.a.num, calcData.b.num, calcData.op);
+            const roundedSolution = '' + roundSolution(solution);
+            updateCurEquationDisplay(true);
+            updateDisplay(roundedSolution);
 
-        resetCalcData(roundedSolution, true);
+            resetCalcData(roundedSolution, true);
+        }
     }
 }
 
@@ -142,26 +156,25 @@ function resetCalcData(numStr, solutionShowing){
     allowBackspace = !solutionShowing;
     calcData.solutionShowing = solutionShowing;
     calcData.op = null;
+    calcData.errorShowing = false;
 }
 
 function parseInput(inputTxt){
     const curDisplay = numDisplay.textContent;
-    if(curDisplay.length < MAX_DISPLAY_LENGTH){
-        if(inputTxt.search(/[0-9]/) !== -1){
-            manageNonOpInputSolutionIsShowing();
-            handleNumericalInput(inputTxt);
-        }
-        else if(inputTxt === '.'){
-            manageNonOpInputSolutionIsShowing();
-            handleDecimalInput(inputTxt);
-        }
-        else if(inputTxt.search(/[\+\-\*\/]/) !== -1){
-            handleOpInput(inputTxt);
-        }
+    if(inputTxt.search(/[0-9]/) !== -1){
+        manageCalcDataSolutionIsShowing();
+        handleNumericalInput(inputTxt);
+    }
+    else if(inputTxt === '.'){
+        manageCalcDataSolutionIsShowing();
+        handleDecimalInput(inputTxt);
+    }
+    else if(inputTxt.search(/[\+\-\*\/]/) !== -1){
+        handleOpInput(inputTxt);
     }
 }
 
-function manageNonOpInputSolutionIsShowing(){
+function manageCalcDataSolutionIsShowing(){
     if(calcData.solutionShowing && calcData.op === null){
         resetCalcData('0', false);
     }
@@ -180,10 +193,13 @@ function handleNumericalInput(inputTxt){
         entryObj.str = inputTxt;
     }
     else{
-        entryObj.str += inputTxt;
+        if(entryObj.str.length < MAX_DISPLAY_LENGTH){
+            entryObj.str += inputTxt;
+        }
         allowBackspace = true;
     }
 
+    calcData.errorShowing = false;
     updateDisplay(entryObj.str);
     updateCurEquationDisplay();
 }
@@ -192,10 +208,13 @@ function handleDecimalInput(inputTxt){
     const entryObj = calcData.a.active ? calcData.a : calcData.b;
 
     if(!entryObj.str.includes('.')){
-        if(entryObj.str.length === 0){
-            entryObj.str = '0';
+        if(entryObj.str === '' || entryObj.str === '0'){
+            entryObj.str = '0.';
         }
-        entryObj.str += inputTxt;
+        else if(entryObj.str.length < MAX_DISPLAY_LENGTH){
+            entryObj.str += inputTxt;
+        }
+        calcData.errorShowing = false;
         updateDisplay(entryObj.str);
         updateCurEquationDisplay();
         allowBackspace = true;
@@ -208,10 +227,14 @@ function handleOpInput(inputTxt){
         calcData.a.active = false;
         calcData.b.active = true;
         calcData.a.num = +calcData.a.str;
+        calcData.errorShowing = false;
     }
     else{
         if(calcData.b.num === null && calcData.b.str === ''){
-            calcData.b.active = true;
+            if(!calcData.errorShowing){
+                calcData.b.active = true;
+                calcData.errorShowing = false;
+            }
         }
         else{
             calcData.b.num = +calcData.b.str;
@@ -219,9 +242,11 @@ function handleOpInput(inputTxt){
         }
     }
 
-    allowBackspace = false;
-    calcData.op = inputTxt;
-    updateCurEquationDisplay();
+    if(!calcData.errorShowing){
+        allowBackspace = false;
+        calcData.op = inputTxt;
+        updateCurEquationDisplay();
+    }
 }
 
 function backspace(){
@@ -256,7 +281,6 @@ function updateDisplay(displayString){
 }
 
 function updateCurEquationDisplay(isSolved = false){
-    //hideCurEquationDisplay();
     const op = calcData.op !== null ? calcData.op : '';
     let curEquation = `${calcData.a.str} ${op} ${calcData.b.str}`;
 
@@ -265,15 +289,4 @@ function updateCurEquationDisplay(isSolved = false){
     }
 
     curEquationDisplay.textContent = curEquation;
-    showCurEquationDisplay();
-}
-
-function hideCurEquationDisplay(){
-    curEquationDisplay.classList.add('opacity0');
-    curEquationDisplay.classList.remove('opacity1');
-}
-
-function showCurEquationDisplay(){
-    curEquationDisplay.classList.add('opacity1');
-    curEquationDisplay.classList.remove('opacity0');
 }
