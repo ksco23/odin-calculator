@@ -66,7 +66,7 @@ function keyupEvt(e){
 }
 
 function solve(){
-    if(calcData.b.num === null && calcData.b.active){
+    if(calcData.b.num === null && (calcData.b.active && calcData.b.str !== '')){
         calcData.b.num = +calcData.b.str;
     }
 
